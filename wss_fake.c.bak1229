@@ -1,0 +1,179 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+
+#define K 1024
+#define M (K*K)
+
+#define LOW 80
+#define HIGH 400
+#define STEP 80
+#define LAST_TIME 20
+#define ROUND 10
+
+typedef long unsigned un_long;
+typedef long unsigned * p_un_long;
+
+
+void run(un_long size, int runtime){
+	un_long *array, i = 0, len=0;
+	int round = runtime, j;
+    double init_time;
+    int sleep_useconds;
+    long counter = 0;
+    
+    init_time = size / 100.0 * 0.08;
+    sleep_useconds = (int)((1 - init_time / round ) * 1000000);
+
+	len = size * M;	
+	array = (un_long *)malloc(len);
+	if(array == NULL)
+		printf("fail\n");
+	srand((int)time(0));
+	for(j=0; j < round; j++){
+		counter = 0;
+		for(i=0 ; i < len / sizeof(un_long); i = i + 512){
+			*(array + i)  = i;
+			//un_long temp = *(array + i);
+			counter ++;
+		}
+	//	printf("counter = %ld\n", counter);
+	//	usleep(sleep_useconds);
+	}
+    free(array);
+}
+
+/*
+void fix_random(un_long size) {
+    printf("enter fix random\n");
+    un_long *array;
+    int i, j, readnum, page_num;
+    long long rand_num;
+    un_long len, temp;
+    len = size * M;
+    array = (un_long *)malloc(len);
+    srand(0);
+    FILE *file, *input;
+    char filename[20];
+    sprintf(filename, "random_%dseed100.txt", size);
+    file = fopen(filename, "w+");
+    input = fopen("input.txt", "w+");
+    readnum = len / 4096 * 100;
+    page_num = len / 4096;
+
+    int temp2 = 5;
+    printf("read %d times\n", readnum);
+    for (i = 0 ; i < readnum ; i++) {
+	rand_num = rand() % page_num;
+	if (temp2 >= 0) {
+	    printf("%d\n", rand_num);
+	    temp2--;
+	}
+	//fprintf(file, "%d\n", rand_num);
+	//fwrite(&rand_num, sizeof(rand_num), 1, input);
+        //temp = *(array + rand_num * 512);
+        *(array + rand_num * 512) = rand_num;
+	for (j = 0 ; j < 512 ; j++) {
+	    temp = *(array + rand_num * 512 + j);
+	}
+    }
+    
+    fclose(file);
+    fclose(input);
+    free(array);
+}*/
+
+void fix_random(un_long size, int round) {
+    printf("enter fix random\n");
+    un_long *array;
+    int i, readnum, page_num;
+    long long rand_num = 0;
+    un_long len ;
+    len = size * M;
+    array = (un_long *)malloc(len);
+    srand(0);
+    readnum = len / 4096 * round;
+    page_num = len / 4096/* / 4096*/;
+    printf("read %d times\n", readnum);
+    //warm up
+    for (i = 0 ; i < len / 4096 ; i++) {
+        //*(array + i * 512/* * 4096 + rand() % 4096 * 512*/) = rand_num;
+        rand_num = *(array + i * 512/* * 4096 + rand() % 4096 * 512*/);
+    }
+    
+    printf("begin to sleep\n");
+    sleep(20);
+    printf("wake up\n");
+
+
+    for (i = 0 ; i < readnum ; i++) {
+	rand_num = rand() % page_num;
+        rand_num = *(array + rand_num * 512/* * 4096 + rand() % 4096 * 512*/);// = rand_num;
+        //*(array + rand_num * 512/* * 4096 + rand() % 4096 * 512*/) = rand_num;
+	//fprintf(file, "%d\n", rand_num);
+	//fwrite(&rand_num, sizeof(rand_num), 1, input);
+        //temp = *(array + rand_num * 512);
+	/*for (j = 0 ; j < 512 ; j++) {
+	    temp = *(array + rand_num * 512 + j);
+	}*/
+    }
+    
+    free(array);
+}
+
+
+/*
+void momo(){
+    int i;
+    for(i = LOW; i < HIGH; i += STEP){
+        run(i, LAST_TIME);
+    }
+    for(i = HIGH; i >= LOW; i -= STEP){
+        run(i, LAST_TIME);
+    }
+}
+
+void randoms(){
+    int size;
+    int i;
+    srand((unsigned)time(0));
+    for(i = 0;i < ROUND; i++){
+        size = rand()%(HIGH - LOW) + LOW;
+        run(size, LAST_TIME);
+    }
+}
+*/
+void randoms(int low, int high, int last_time){
+    int size;
+    int i;
+    srand((unsigned)time(0));
+    size = rand()%(high - low) + low;
+    printf("%d\n",size);
+    run(size, last_time);
+}
+void ma(){
+	malloc(100 * M *8);
+}
+int main(int argc, char **argv){
+    printf("argc:%d\n", argc);
+    switch(argc){
+        case 4:
+            randoms(atoi(argv[1]),atoi(argv[2]), atoi(argv[3]));
+            break;
+        case 3:
+            //run(atoi(argv[1]), atoi(argv[2]));
+	    fix_random(atoi(argv[1]), atoi(argv[2]));
+            break;
+	case 2:
+	    fix_random(atoi(argv[1]), 100);
+	    break;
+        case 1:
+            run(100,2); 
+            break;
+    }
+    //momo();
+    //randoms();
+    return 0;
+}
+
