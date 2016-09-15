@@ -1,0 +1,1 @@
+cmd_/wssfake/test_pmu/pmu_module/run_pmu.ko := ld -r -m elf_x86_64 -T /common/mb/linux-3.10.12/scripts/module-common.lds --build-id  -o /wssfake/test_pmu/pmu_module/run_pmu.ko /wssfake/test_pmu/pmu_module/run_pmu.o /wssfake/test_pmu/pmu_module/run_pmu.mod.o
