@@ -24,15 +24,17 @@ int main(int argc, char **argv){
     if(NULL == array){
 	printf("fail\n");
     }
-    printf("write\n");
+    printf("read\n");
     printf("array_size=%d round=%d maxinter:%d\n",array_size,round,maxinter);
+    un_long temp = 0;
     for(j=0; j < round; j++){
-//		printf("cnt=%d\n",j);
+		temp -= j;
 		for(i=0 ; i < maxinter; i = i + 1){
-			*(array + i)  = i;
+			temp += *(array + i);
 			cntw++;
 		}
     }
+	printf("temp:%lu\n", temp);
     printf("cntw=%lu\n",cntw);
     free(array);
 }
